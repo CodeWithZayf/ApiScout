@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Core Models
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?   // Nullable for OAuth users
+  role          Role      @default(USER)
+  emailVerified DateTime?
+  image         String?
+  
+  // Relations
+  bookmarks     Bookmark[]
+  reviews       Review[]
+  submissions   ApiSubmission[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@index([email])
+  @@map("users")
+}
+
+model Api {
+  id                String    @id @default(cuid())
+  name              String
+  slug              String    @unique
+  description       String    @db.Text
+  websiteUrl        String
+  documentationUrl  String
+  logoUrl           String?
+  
+  // Filtering fields
+  authType          AuthType
+  rateLimit         RateLimit
+  isOpenSource      Boolean   @default(false)
+  isFree            Boolean   @default(false)
+  difficultyLevel   Difficulty @default(INTERMEDIATE)
+  
+  // Status tracking
+  status            ApiStatus  @default(ACTIVE)
+  lastChecked       DateTime?
+  isDeprecated      Boolean    @default(false)
+  
+  // Stats (denormalized for performance)
+  bookmarkCount     Int        @default(0)
+  reviewCount       Int        @default(0)
+  viewCount         Int        @default(0)
+  averageRating     Float      @default(0)
+  
+  // Relations
+  categoryId        String
+  category          Category   @relation(fields: [categoryId], references: [id])
+  bookmarks         Bookmark[]
+  reviews           Review[]
+  
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  
+  @@index([slug])
+  @@index([categoryId])
+  @@index([authType])
+  @@index([rateLimit])
+  @@index([status])
+  @@map("apis")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  icon        String?
+  
+  // Relations
+  apis        Api[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([slug])
+  @@map("categories")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  apiId     String
+  api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, apiId])
+  @@index([userId])
+  @@index([apiId])
+  @@map("bookmarks")
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      // 1-5 stars
+  comment     String?  @db.Text
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  apiId       String
+  api         Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, apiId]) // One review per user per API
+  @@index([apiId])
+  @@index([rating])
+  @@map("reviews")
+}
+
+model ApiSubmission {
+  id               String           @id @default(cuid())
+  name             String
+  websiteUrl       String
+  documentationUrl String
+  description      String           @db.Text
+  categoryName     String
+  
+  status           SubmissionStatus @default(PENDING)
+  reviewNotes      String?          @db.Text
+  
+  submittedBy      String
+  user             User             @relation(fields: [submittedBy], references: [id])
+  
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  @@index([status])
+  @@index([submittedBy])
+  @@map("api_submissions")
+}
+
+// Enums
+enum Role {
+  USER
+  CONTRIBUTOR
+  ADMIN
+}
+
+enum AuthType {
+  API_KEY
+  OAUTH
+  NONE
+  BEARER_TOKEN
+}
+
+enum RateLimit {
+  LOW        // < 100 req/day
+  MEDIUM     // 100-10k req/day
+  HIGH       // > 10k req/day
+  UNLIMITED
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ApiStatus {
+  ACTIVE
+  DEPRECATED
+  MAINTENANCE
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
