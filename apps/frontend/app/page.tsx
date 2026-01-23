@@ -1,24 +1,13 @@
-import SearchBar from "@/components/search/SearchBar";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Search, GitCompare, Star, TrendingUp, Filter, Zap } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-7xl px-4 py-20">
-      {/* Hero Section */}
-      <section className="text-center space-y-6">
-<h1 className="text-4xl sm:text-5xl font-bold tracking-tight">
-  Discover the right API for your project
-</h1>
-
-
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Search, compare, and review APIs across multiple categories.
-          Built for developers who value clarity over clutter.
-        </p>
-
-        <div className="mt-8">
-          <SearchBar />
-        </div>
-      </section>
-    </main>
+    <div className="p-10 bg-red-500 text-white">
+      Tailwind is working
+    </div>
   );
 }
