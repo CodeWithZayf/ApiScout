@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,17 +63,8 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Right: Search + Actions */}
+          {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {/* Search Bar */}
-            <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-1.5 text-sm text-gray-500">
-              <Search size={14} />
-              <input
-                placeholder="Search..."
-                className="w-20 bg-transparent outline-none sm:w-32 md:w-40"
-              />
-            </div>
-
             {/* Auth - Desktop Only */}
             <Link href="/login" className="hidden lg:block">
               <Button

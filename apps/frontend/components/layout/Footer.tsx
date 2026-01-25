@@ -1,53 +1,85 @@
+// components/layout/Footer.tsx
 import Link from "next/link";
-import { Separator } from "@/components/ui/separator";
+import { Github, Twitter, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/50">
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="border-t bg-background">
+      <div className="mx-auto max-w-6xl px-6 py-16">
+
+        {/* Top */}
+        <div className="grid gap-12 md:grid-cols-4">
+
           {/* Brand */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-bold">ApiScout</h3>
+          <div>
+            <div className="mb-4 flex items-center gap-2 font-semibold">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-black text-white">
+                A
+              </div>
+              ApiScout
+            </div>
+
             <p className="text-sm text-muted-foreground">
-              Discover the right API faster, without noise.
+              The definitive registry for public APIs. Helping developers build
+              better software, faster.
             </p>
+
+            <div className="mt-4 flex gap-4 text-muted-foreground">
+              <a href="#" className="hover:text-foreground">
+                <Github className="h-5 w-5" />
+              </a>
+              <a href="#" className="hover:text-foreground">
+                <Twitter className="h-5 w-5" />
+              </a>
+              <a href="#" className="hover:text-foreground">
+                <Linkedin className="h-5 w-5" />
+              </a>
+            </div>
           </div>
 
-          {/* Product */}
-          <div className="space-y-3">
-            <h4 className="font-semibold">Product</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/categories" className="text-muted-foreground hover:text-foreground">Categories</Link></li>
-              <li><Link href="/trending" className="text-muted-foreground hover:text-foreground">Trending</Link></li>
-              <li><Link href="/compare" className="text-muted-foreground hover:text-foreground">Compare APIs</Link></li>
+          {/* Platform */}
+          <div>
+            <h4 className="mb-4 text-sm font-semibold">Platform</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/apis">Browse</Link></li>
+              <li><Link href="/categories">Categories</Link></li>
+              <li><Link href="/compare">Comparisons</Link></li>
+              <li><Link href="/submit">Submit API</Link></li>
             </ul>
           </div>
 
           {/* Resources */}
-          <div className="space-y-3">
-            <h4 className="font-semibold">Resources</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/submit" className="text-muted-foreground hover:text-foreground">Submit API</Link></li>
-              <li><Link href="/guides" className="text-muted-foreground hover:text-foreground">Guides</Link></li>
-              <li><Link href="/blog" className="text-muted-foreground hover:text-foreground">Blog</Link></li>
+          <div>
+            <h4 className="mb-4 text-sm font-semibold">Resources</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/docs">Documentation</Link></li>
+              <li><Link href="/standards">API Standards</Link></li>
+              <li><Link href="/blog">Blog</Link></li>
+              <li><Link href="/community">Community</Link></li>
             </ul>
           </div>
 
-          {/* Legal */}
-          <div className="space-y-3">
-            <h4 className="font-semibold">Legal</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/privacy" className="text-muted-foreground hover:text-foreground">Privacy</Link></li>
-              <li><Link href="/terms" className="text-muted-foreground hover:text-foreground">Terms</Link></li>
+          {/* Company */}
+          <div>
+            <h4 className="mb-4 text-sm font-semibold">Company</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li><Link href="/about">About</Link></li>
+              <li><Link href="/legal">Legal</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </div>
         </div>
-        
-        <Separator className="my-8" />
-        
-        <div className="text-center text-sm text-muted-foreground">
-          © 2026 ApiScout. All rights reserved.
+
+        {/* Bottom */}
+        <div className="mt-16 flex flex-col items-center justify-between gap-6 border-t pt-6 text-sm text-muted-foreground md:flex-row">
+
+          <span>© {new Date().getFullYear()} ApiScout. All rights reserved.</span>
+
+          <span className="rounded-full bg-black px-4 py-1.5 text-xs font-medium text-white">
+            Made With ❤️ By ApiScout
+          </span>
+
+          <span className="text-xs">Powered by ApiScout</span>
         </div>
       </div>
     </footer>
