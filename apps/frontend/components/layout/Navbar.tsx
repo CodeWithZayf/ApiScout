@@ -3,16 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout, isLoading } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 py-3">
       <div className="mx-auto max-w-6xl">
         <nav className="flex h-20 items-center justify-between gap-4 rounded-2xl border border-gray-200/60 bg-white/80 px-4 shadow-sm backdrop-blur-md">
-          
+
           {/* Left: Hamburger (mobile) + Logo */}
           <div className="flex items-center gap-3">
             {/* Hamburger Menu Button - Mobile Only */}
@@ -56,6 +58,12 @@ export function Navbar() {
               Compare
             </Link>
             <Link
+              href="/trending"
+              className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+            >
+              Trending
+            </Link>
+            <Link
               href="/submit"
               className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
             >
@@ -65,26 +73,51 @@ export function Navbar() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {/* Auth - Desktop Only */}
-            <Link href="/login" className="hidden lg:block">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              >
-                Sign in
-              </Button>
-            </Link>
-            <Link href="/signup" className="hidden lg:block">
-              <Button
-                size="sm"
-                className="rounded-xl bg-orange-500 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
-              >
-                Get Started
-                <span className="ml-1 text-orange-200">·</span>
-                <span className="text-orange-200">It&apos;s Free</span>
-              </Button>
-            </Link>
+            {!isLoading && (
+              <>
+                {user ? (
+                  <div className="hidden items-center gap-2 lg:flex">
+                    <div className="flex items-center gap-2 rounded-xl bg-gray-100 px-3 py-1.5">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-xs font-bold text-white">
+                        {user.name?.[0] || user.email[0].toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">
+                        {user.name || user.email.split("@")[0]}
+                      </span>
+                    </div>
+                    <button
+                      onClick={logout}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
+                      title="Sign out"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Link href="/login" className="hidden lg:block">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      >
+                        Sign in
+                      </Button>
+                    </Link>
+                    <Link href="/signup" className="hidden lg:block">
+                      <Button
+                        size="sm"
+                        className="rounded-xl bg-orange-500 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                      >
+                        Get Started
+                        <span className="ml-1 text-orange-200">·</span>
+                        <span className="text-orange-200">It&apos;s Free</span>
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </nav>
 
@@ -125,25 +158,44 @@ export function Navbar() {
               <div className="my-2 h-px bg-gray-200" />
 
               {/* Auth Links */}
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/signup"
-                onClick={() => setMobileMenuOpen(false)}
-                className="mt-1"
-              >
-                <Button
-                  size="sm"
-                  className="w-46 rounded-xl bg-orange-500 py-3 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
-                >
-                  Get Started · It&apos;s Free
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2 px-4 py-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-xs font-bold text-white">
+                      {user.name?.[0] || user.email[0].toUpperCase()}
+                    </div>
+                    <span className="text-sm font-medium">{user.name || user.email}</span>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="rounded-lg px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="mt-1"
+                  >
+                    <Button
+                      size="sm"
+                      className="w-46 rounded-xl bg-orange-500 py-3 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                    >
+                      Get Started · It&apos;s Free
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

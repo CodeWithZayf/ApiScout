@@ -1,21 +1,26 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-if (!API_BASE_URL) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
-}
+export async function apiFetch<T = any>(path: string, options?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
+    ...(options?.headers as Record<string, string> || {}),
+  };
 
-export async function apiFetch(path: string, options?: RequestInit) {
+  // Only set Content-Type for requests with a body
+  if (options?.body) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+  }
+
   const res = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options?.headers || {}),
-    },
+    headers,
+    next: { revalidate: 60 },
   });
 
   if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
+    throw new Error(`API error: ${res.status} ${res.statusText}`);
   }
 
   return res.json();
 }
+
+export { API_BASE_URL };

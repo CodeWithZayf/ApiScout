@@ -37,13 +37,14 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Platform */}
           <div>
             <h4 className="mb-4 text-sm font-semibold">Platform</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><Link href="/apis">Browse</Link></li>
               <li><Link href="/categories">Categories</Link></li>
+              <li><Link href="/trending">Trending</Link></li>
               <li><Link href="/compare">Comparisons</Link></li>
+              <li><Link href="/best-apis">Best APIs Guide</Link></li>
               <li><Link href="/submit">Submit API</Link></li>
             </ul>
           </div>

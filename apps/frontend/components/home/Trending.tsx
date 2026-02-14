@@ -1,123 +1,90 @@
-import { Star, Bookmark } from "lucide-react";
+import Link from "next/link";
+import { Star, ArrowRight } from "lucide-react";
+import { apiFetch } from "@/lib/api";
+import { ApiItem } from "@/lib/types";
+import { PRICING_LABELS, PRICING_COLORS } from "@/lib/constants";
 
-const apis = [
-  {
-    name: "Stripe API",
-    company: "Stripe, Inc.",
-    description:
-      "Financial infrastructure platform for the internet. Accept payments, send payouts, and manage businesses online.",
-    category: "Payments",
-    pricing: "Freemium",
-    rating: 4.9,
-    protocol: "REST",
-    uptime: "99.99%",
-  },
-  {
-    name: "GitHub API",
-    company: "GitHub",
-    description:
-      "Create integrations, retrieve data, and automate your workflows with the world's leading software development platform.",
-    category: "DevTools",
-    pricing: "Free",
-    rating: 4.8,
-    protocol: "REST / GraphQL",
-    uptime: "99.95%",
-  },
-  {
-    name: "Twilio",
-    company: "Twilio",
-    description:
-      "Connect with customers everywhere they want to interact. SMS, Voice, Video, and Email APIs for every platform.",
-    category: "Communication",
-    pricing: "Paid",
-    rating: 4.7,
-    protocol: "REST",
-    uptime: "99.99%",
-  },
-];
+export async function Trending() {
+  let apis: ApiItem[] = [];
 
-export function Trending() {
+  try {
+    apis = await apiFetch<ApiItem[]>("/apis/trending?limit=6");
+  } catch {
+    // Graceful fallback
+  }
+
+  if (apis.length === 0) return null;
+
   return (
     <section className="border-t bg-background">
       <div className="mx-auto max-w-6xl px-6 py-20">
-
         {/* Header */}
         <div className="mb-10 flex items-center justify-between">
           <h2 className="text-2xl font-semibold">Trending this week</h2>
-
-          <div className="flex items-center gap-2 text-sm">
-            <button className="rounded-full bg-black px-4 py-1.5 text-white">
-              All
-            </button>
-            <button className="rounded-full px-4 py-1.5 text-muted-foreground hover:bg-muted">
-              Free
-            </button>
-            <button className="rounded-full px-4 py-1.5 text-muted-foreground hover:bg-muted">
-              Paid
-            </button>
-          </div>
+          <Link
+            href="/trending"
+            className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+          >
+            View all <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
         {/* Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {apis.map((api) => (
-            <div
-              key={api.name}
-              className="rounded-2xl border bg-background p-6 transition hover:shadow-md"
+            <Link
+              key={api.id}
+              href={`/api/${api.slug}`}
+              className="rounded-2xl border bg-background p-6 transition hover:shadow-md block"
             >
               {/* Top row */}
               <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{api.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    By {api.company}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-pink-500 text-lg font-bold text-white">
+                    {api.name[0]}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold">{api.name}</h3>
+                    {api.providerName && (
+                      <p className="text-sm text-muted-foreground">
+                        By {api.providerName}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <Bookmark className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer" />
               </div>
 
               {/* Description */}
-              <p className="mb-4 text-sm text-muted-foreground">
+              <p className="mb-4 text-sm text-muted-foreground line-clamp-2">
                 {api.description}
               </p>
 
               {/* Tags */}
               <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
                 <span className="rounded-md bg-muted px-2 py-1">
-                  {api.category}
+                  {api.category.name}
                 </span>
-
                 <span
-                  className={`rounded-md px-2 py-1 ${
-                    api.pricing === "Paid"
-                      ? "bg-blue-100 text-blue-600"
-                      : api.pricing === "Freemium"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
+                  className={`rounded-md px-2 py-1 ${PRICING_COLORS[api.pricingType]}`}
                 >
-                  {api.pricing}
+                  {PRICING_LABELS[api.pricingType]}
                 </span>
-
                 <span className="flex items-center gap-1 font-medium">
                   <Star className="h-4 w-4 text-orange-400 fill-orange-400" />
-                  {api.rating}
+                  {api.averageRating.toFixed(1)}
                 </span>
               </div>
 
               {/* Footer */}
               <div className="flex items-center justify-between border-t pt-4 text-sm">
                 <span className="text-muted-foreground">
-                  {api.protocol} • {api.uptime} uptime
+                  {api.viewCount.toLocaleString()} views
                 </span>
-                <a
-                  href="#"
-                  className="font-medium text-blue-600 hover:underline"
-                >
+                <span className="font-medium text-blue-600">
                   Details →
-                </a>
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

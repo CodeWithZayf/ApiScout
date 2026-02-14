@@ -6,7 +6,8 @@ datasource db {
   provider = "postgresql"
 }
 
-// Core Models
+// ─── Core Models ────────────────────────────────────────────────
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -15,60 +16,87 @@ model User {
   role          Role      @default(USER)
   emailVerified DateTime?
   image         String?
-  
+
+  // OAuth fields
+  provider      String?   // "google", "github", etc.
+  providerId    String?   // Provider-specific user ID
+
   // Relations
   bookmarks     Bookmark[]
   reviews       Review[]
   submissions   ApiSubmission[]
-  
+  feedbackSignals FeedbackSignal[]
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  
+
+  @@unique([provider, providerId])
   @@index([email])
   @@map("users")
 }
 
 model Api {
-  id                String    @id @default(cuid())
+  id                String      @id @default(cuid())
   name              String
-  slug              String    @unique
-  description       String    @db.Text
+  slug              String      @unique
+  description       String      @db.Text
   websiteUrl        String
   documentationUrl  String
   logoUrl           String?
-  
+
+  // Provider info
+  providerName      String?
+
   // Filtering fields
+  pricingType       PricingType @default(FREE)
   authType          AuthType
   rateLimit         RateLimit
-  isOpenSource      Boolean   @default(false)
-  isFree            Boolean   @default(false)
-  difficultyLevel   Difficulty @default(INTERMEDIATE)
-  
+  isOpenSource      Boolean     @default(false)
+  difficultyLevel   Difficulty  @default(INTERMEDIATE)
+
+  // Extended details for profile page
+  pricingSummary    String?     @db.Text
+  useCases          String?     @db.Text  // JSON array stored as text
+  rateLimitInfo     String?     @db.Text
+  authDescription   String?     @db.Text
+
+  // External links
+  dashboardUrl      String?
+  pricingUrl        String?
+
   // Status tracking
-  status            ApiStatus  @default(ACTIVE)
+  status            ApiStatus   @default(ACTIVE)
+  isFeatured        Boolean     @default(false)
   lastChecked       DateTime?
-  isDeprecated      Boolean    @default(false)
-  
+  isDeprecated      Boolean     @default(false)
+
   // Stats (denormalized for performance)
-  bookmarkCount     Int        @default(0)
-  reviewCount       Int        @default(0)
-  viewCount         Int        @default(0)
-  averageRating     Float      @default(0)
-  
+  bookmarkCount     Int         @default(0)
+  reviewCount       Int         @default(0)
+  viewCount         Int         @default(0)
+  likeCount         Int         @default(0)
+  averageRating     Float       @default(0)
+
   // Relations
   categoryId        String
-  category          Category   @relation(fields: [categoryId], references: [id])
+  category          Category    @relation(fields: [categoryId], references: [id])
+  tags              ApiTag[]
   bookmarks         Bookmark[]
   reviews           Review[]
-  
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  
+  feedbackSignals   FeedbackSignal[]
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
   @@index([slug])
   @@index([categoryId])
+  @@index([pricingType])
   @@index([authType])
   @@index([rateLimit])
   @@index([status])
+  @@index([isFeatured])
+  @@index([viewCount])
+  @@index([averageRating])
   @@map("apis")
 }
 
@@ -78,28 +106,56 @@ model Category {
   slug        String   @unique
   description String?
   icon        String?
-  
+
   // Relations
   apis        Api[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([slug])
   @@map("categories")
 }
 
-model Bookmark {
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+
+  // Relations
+  apis        ApiTag[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@map("tags")
+}
+
+model ApiTag {
   id        String   @id @default(cuid())
-  
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   apiId     String
   api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
-  
+  tagId     String
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([apiId, tagId])
+  @@index([apiId])
+  @@index([tagId])
+  @@map("api_tags")
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  apiId     String
+  api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
   createdAt DateTime @default(now())
-  
+
   @@unique([userId, apiId])
   @@index([userId])
   @@index([apiId])
@@ -110,20 +166,37 @@ model Review {
   id          String   @id @default(cuid())
   rating      Int      // 1-5 stars
   comment     String?  @db.Text
-  
+
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   apiId       String
   api         Api      @relation(fields: [apiId], references: [id], onDelete: Cascade)
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@unique([userId, apiId]) // One review per user per API
   @@index([apiId])
   @@index([rating])
   @@map("reviews")
+}
+
+model FeedbackSignal {
+  id        String       @id @default(cuid())
+  type      FeedbackType
+
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  apiId     String
+  api       Api          @relation(fields: [apiId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, apiId, type]) // One signal per type per user per API
+  @@index([apiId])
+  @@map("feedback_signals")
 }
 
 model ApiSubmission {
@@ -133,26 +206,34 @@ model ApiSubmission {
   documentationUrl String
   description      String           @db.Text
   categoryName     String
-  
+  providerContact  String?
+
   status           SubmissionStatus @default(PENDING)
   reviewNotes      String?          @db.Text
-  
+
   submittedBy      String
   user             User             @relation(fields: [submittedBy], references: [id])
-  
+
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
-  
+
   @@index([status])
   @@index([submittedBy])
   @@map("api_submissions")
 }
 
-// Enums
+// ─── Enums ──────────────────────────────────────────────────────
+
 enum Role {
   USER
   CONTRIBUTOR
   ADMIN
+}
+
+enum PricingType {
+  FREE
+  FREEMIUM
+  PAID
 }
 
 enum AuthType {
@@ -179,6 +260,12 @@ enum ApiStatus {
   ACTIVE
   DEPRECATED
   MAINTENANCE
+}
+
+enum FeedbackType {
+  USEFUL
+  OVERPRICED
+  OUTDATED
 }
 
 enum SubmissionStatus {

@@ -1,9 +1,22 @@
 // components/home/Hero.tsx
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search, ArrowRight, CheckCircle } from "lucide-react";
 
 export function Hero() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      router.push(`/apis?search=${encodeURIComponent(query.trim())}`);
+    } else {
+      router.push("/apis");
+    }
+  };
+
   return (
     <section className="relative overflow-hidden">
       <div className="mx-auto max-w-4xl px-6 pt-28 pb-32 text-center">
@@ -33,9 +46,15 @@ export function Hero() {
           <input
             type="text"
             placeholder="Search payment, auth, email, or AI APIs..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             className="flex-1 bg-transparent px-4 py-4 text-base outline-none"
           />
-          <button className="m-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white hover:opacity-90">
+          <button
+            onClick={handleSearch}
+            className="m-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-black text-white hover:opacity-90 transition"
+          >
             <ArrowRight className="h-5 w-5" />
           </button>
         </div>
@@ -57,3 +76,4 @@ export function Hero() {
     </section>
   );
 }
+

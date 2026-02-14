@@ -1,4 +1,5 @@
 // components/home/ComparePreview.tsx
+import Link from "next/link";
 import { Check } from "lucide-react";
 
 export function ComparePreview() {
@@ -40,9 +41,9 @@ export function ComparePreview() {
               ))}
             </ul>
 
-            <button className="mt-10 rounded-lg bg-white px-6 py-3 font-medium text-black hover:bg-white/90">
+            <Link href="/compare" className="mt-10 inline-block rounded-lg bg-white px-6 py-3 font-medium text-black hover:bg-white/90">
               Try Comparison Tool
-            </button>
+            </Link>
           </div>
 
           {/* RIGHT TABLE */}

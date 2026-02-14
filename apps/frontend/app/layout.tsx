@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { AuthProvider } from "@/lib/auth-context";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -41,12 +42,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${poppins.className} antialiased`}>
-        <div className="flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
