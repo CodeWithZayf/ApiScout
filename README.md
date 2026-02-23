@@ -133,9 +133,6 @@ Contributions are welcome. Suggested workflow:
 2. Create a feature branch: `git checkout -b feat/your-feature`
 3. Commit changes with clear messages
 4. Open a Pull Request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
-
 ---
 
 ## License
