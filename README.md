@@ -1,111 +1,147 @@
+<div align="center">
+
 # 🧭 ApiScout
 
-![Status](https://img.shields.io/badge/status-active%20development-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)
-![Built%20With](https://img.shields.io/badge/built%20with-Next.js%20%7C%20NestJS-blueviolet)
+[![Status](https://img.shields.io/badge/status-active-blue?style=for-the-badge)](https://github.com/CodeWithZayf/APIscout)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](./LICENSE)
+[![Stack](https://img.shields.io/badge/stack-Next.js%20%7C%20NestJS%20%7C%20PostgreSQL-blueviolet?style=for-the-badge)](#-tech-stack)
 
-**ApiScout** is a developer-focused platform to **discover, compare, review, and bookmark APIs** across multiple categories—helping developers choose the right API faster, without noise.
+A full‑stack API discovery platform to discover, compare, review, and bookmark APIs faster.
 
----
-
-## 🚀 Why ApiScout?
-
-Finding the right API often means:
-- Searching multiple blogs
-- Comparing outdated lists
-- Jumping between documentation pages
-
-**ApiScout solves this** by offering a single, clean platform focused on **clarity, discovery, and trust**—built by developers, for developers.
+</div>
 
 ---
 
-## ✨ Core Features
+## Table of contents
 
-- 🔍 **API Discovery**
-  - Search APIs by name and category
-  - Filter by **Free / Freemium / Paid**
-
-- 🗂️ **Categories & Tags**
-  - Well-defined API categories
-  - Tags like *Free*, *No Auth*, *Beginner Friendly*, *Popular*
-
-- ⭐ **Reviews & Ratings**
-  - Read community reviews
-  - Submit short, meaningful feedback
-
-- 🔖 **Bookmarks**
-  - Save APIs for later
-  - Personalized dashboard
-
-- ⚖️ **API Comparison**
-  - Compare multiple APIs side-by-side
-  - Pricing, authentication, ease of use
-
-- 👤 **User Accounts**
-  - Secure authentication
-  - Personalized experience
+- [Overview](#overview)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Tech Stack](#-tech-stack)
+- [API Reference (quick)](#api-reference-quick)
+- [Local Development](#local-development)
+- [Docker](#docker)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 💻 Tech Stack
+## Overview
 
-### Frontend
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat&logo=typescript&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
-![shadcn/ui](https://img.shields.io/badge/shadcn/ui-000000?style=flat&logo=radix-ui&logoColor=white)
+ApiScout centralizes API discovery: search, compare, review, and bookmark APIs across categories so developers can choose the right provider faster and with confidence.
 
-### Backend
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=flat&logo=prisma&logoColor=white)
+Key goals:
 
-### Database & Infra
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=flat&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel&logoColor=white)
+- Fast search and filters
+- Clear, developer-focused UI
+- Community reviews and ratings
+- Lightweight admin workflows for maintaining API entries
 
 ---
 
-## 🧠 Design Principles
+## Architecture
 
-- Developer-first UX
-- Clean and minimal UI
-- SEO-friendly discovery
-- Modular, scalable architecture
-- No overengineering
+Frontend (Next.js) → Backend (NestJS REST API) → PostgreSQL (Prisma ORM)
 
----
+Simple pipeline:
 
-## 🚧 Project Status
-
-🚧 **Active Development**
-
-Planned enhancements:
-- Advanced search & ranking
-- API freshness indicators
-- Provider onboarding
-- Unified API access (future phase)
+- Next.js handles SSR pages, client interactions, and admin UI
+- NestJS implements controllers, services, and Prisma access layers
+- PostgreSQL stores normalized data with relations for tags, categories, and users
 
 ---
 
-## 🤝 Contributing
+## Features
 
-Contributions are welcome.
-
-1. Fork the repository  
-2. Create a feature branch  
-3. Submit a pull request  
-
-Please keep changes clean, focused, and well-documented.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
+- Authentication: JWT-based auth with role-based access (Admin / User)
+- API Discovery: search, filter, pagination, and category/tag browsing
+- Reviews & Ratings: community feedback for API entries
+- Bookmarks: users can save APIs to their profile
+- Admin: create/update API entries (admin only)
+- Docker-ready for production
 
 ---
 
-**ApiScout — built with ❤️ to help developers choose better APIs, faster.**
+## - Tech Stack
 
+- Frontend: Next.js, TypeScript, TailwindCSS, shadcn/ui
+- Backend: NestJS, TypeScript, Prisma ORM
+- Database: PostgreSQL
+- Infrastructure: Docker, docker-compose, Vercel (frontend)
+
+---
+
+## API Reference (quick)
+
+- POST /auth/register — Register a user
+- POST /auth/login — Login and receive JWT
+- GET /apis — List APIs (supports pagination and query filters)
+- GET /apis?category=<name>&page=<n> — Filtered APIs
+- POST /apis — Create API entry (Admin only)
+- POST /bookmark — Bookmark an API (authenticated)
+
+---
+
+## Local development
+
+Backend
+
+1. Install dependencies and run dev server:
+
+```bash
+cd apps/backend
+npm install
+npm run start:dev
+```
+
+2. Environment variables
+
+Create a `.env` with at least:
+
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/apiscout
+JWT_SECRET=your_jwt_secret_here
+```
+
+Frontend
+
+```bash
+cd apps/frontend
+npm install
+npm run dev
+```
+
+---
+
+## Docker
+
+Start both services with docker-compose:
+
+```bash
+docker-compose up --build
+```
+
+Ensure `.env` is configured for the database before bringing up containers.
+
+---
+
+## Contributing
+
+Contributions are welcome. Suggested workflow:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit changes with clear messages
+4. Open a Pull Request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
+
+Made with ❤️ to help developers choose better APIs, faster.
