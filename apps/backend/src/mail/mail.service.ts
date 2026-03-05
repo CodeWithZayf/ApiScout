@@ -15,7 +15,7 @@ export class MailService {
         }
         this.resend = new Resend(apiKey);
         this.fromEmail =
-            this.configService.get<string>('RESEND_FROM_EMAIL') ?? 'noreply@apiscout.com';
+            this.configService.get<string>('RESEND_FROM_EMAIL') ?? 'noreply@apiscout.in';
     }
 
     async sendOtp(email: string, otp: string, name?: string): Promise<void> {

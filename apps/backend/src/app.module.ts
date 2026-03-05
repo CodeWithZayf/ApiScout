@@ -26,7 +26,7 @@ import { AppService } from './app.service';
         JWT_SECRET: Joi.string().min(16).required(),
         REDIS_URL: Joi.string().default('redis://localhost:6379'),
         RESEND_API_KEY: Joi.string().required(),
-        RESEND_FROM_EMAIL: Joi.string().email().default('noreply@apiscout.com'),
+        RESEND_FROM_EMAIL: Joi.string().email().default('noreply@apiscout.in'),
         CORS_ORIGIN: Joi.string().default('http://localhost:3000'),
         PORT: Joi.number().default(3001),
         NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
