@@ -46,8 +46,16 @@ export class SubmissionsController {
 
     @Get('mine')
     @UseGuards(JwtAuthGuard)
-    findMine(@Request() req: any) {
-        return this.submissionsService.findUserSubmissions(req.user.sub);
+    findMine(
+        @Request() req: any,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+    ) {
+        return this.submissionsService.findUserSubmissions(
+            req.user.sub,
+            page ? +page : 1,
+            limit ? +limit : 20,
+        );
     }
 
     @Patch(':id/status')

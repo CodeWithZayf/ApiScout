@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -64,27 +64,42 @@ function CompareContent() {
         router.replace(slugs ? `/compare?apis=${slugs}` : "/compare", { scroll: false });
     };
 
-    const handleSearch = async (q: string) => {
+    const abortRef = useRef<AbortController | null>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleSearch = useCallback((q: string) => {
         setSearchQuery(q);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (abortRef.current) abortRef.current.abort();
+
         if (q.length < 2) {
             setSearchResults([]);
             return;
         }
-        setSearching(true);
-        try {
-            const res = await fetch(`${API_BASE_URL}/apis?search=${encodeURIComponent(q)}&limit=5`);
-            const data = await res.json();
-            const results = data.data || data;
-            setSearchResults(
-                (Array.isArray(results) ? results : []).filter(
-                    (r: ApiItem) => !apis.some((a) => a.id === r.id)
-                )
-            );
-        } catch {
-            setSearchResults([]);
-        }
-        setSearching(false);
-    };
+
+        debounceRef.current = setTimeout(async () => {
+            const controller = new AbortController();
+            abortRef.current = controller;
+            setSearching(true);
+            try {
+                const res = await fetch(
+                    `${API_BASE_URL}/apis?search=${encodeURIComponent(q)}&limit=5`,
+                    { signal: controller.signal },
+                );
+                if (!res.ok) throw new Error('Search failed');
+                const data = await res.json();
+                const results = data.data || data;
+                setSearchResults(
+                    (Array.isArray(results) ? results : []).filter(
+                        (r: ApiItem) => !apis.some((a) => a.id === r.id)
+                    )
+                );
+            } catch (e: any) {
+                if (e?.name !== 'AbortError') setSearchResults([]);
+            }
+            setSearching(false);
+        }, 300);
+    }, [apis]);
 
     const addApi = (api: ApiItem) => {
         if (apis.length >= 4) return;

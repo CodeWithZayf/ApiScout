@@ -102,23 +102,6 @@ export default function LoginPage() {
                         Create one
                     </Link>
                 </p>
-
-                {/* Demo credentials */}
-                <div className="mt-8 rounded-xl border border-dashed bg-gray-50/50 p-4">
-                    <p className="mb-2 text-xs font-medium text-muted-foreground">Demo Credentials</p>
-                    <div className="flex gap-4 text-xs">
-                        <div>
-                            <p className="font-medium">Admin</p>
-                            <p className="text-muted-foreground">admin@apiscout.com</p>
-                            <p className="text-muted-foreground">admin123</p>
-                        </div>
-                        <div>
-                            <p className="font-medium">User</p>
-                            <p className="text-muted-foreground">dev@example.com</p>
-                            <p className="text-muted-foreground">user123</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     );

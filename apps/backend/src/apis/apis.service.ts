@@ -135,10 +135,16 @@ export class ApisService {
     }
 
     async incrementView(slug: string) {
-        await this.prisma.api.update({
-            where: { slug },
-            data: { viewCount: { increment: 1 } },
-        });
+        try {
+            await this.prisma.api.update({
+                where: { slug },
+                data: { viewCount: { increment: 1 } },
+            });
+        } catch (e: any) {
+            // Silently ignore if slug doesn't exist (P2025) — no-op
+            if (e?.code === 'P2025') return { success: true };
+            throw e;
+        }
         return { success: true };
     }
 
@@ -203,23 +209,25 @@ export class ApisService {
     async update(id: string, dto: UpdateApiDto) {
         const { tagIds, ...data } = dto;
 
-        // If tagIds provided, delete existing and recreate
-        if (tagIds) {
-            await this.prisma.apiTag.deleteMany({ where: { apiId: id } });
-        }
+        // Wrap tag replacement + update in a transaction to prevent partial writes
+        const api = await this.prisma.$transaction(async (tx) => {
+            if (tagIds) {
+                await tx.apiTag.deleteMany({ where: { apiId: id } });
+            }
 
-        const api = await this.prisma.api.update({
-            where: { id },
-            data: {
-                ...data,
-                tags: tagIds?.length
-                    ? { create: tagIds.map((tagId) => ({ tagId })) }
-                    : undefined,
-            },
-            include: {
-                category: true,
-                tags: { include: { tag: true } },
-            },
+            return tx.api.update({
+                where: { id },
+                data: {
+                    ...data,
+                    tags: tagIds?.length
+                        ? { create: tagIds.map((tagId) => ({ tagId })) }
+                        : undefined,
+                },
+                include: {
+                    category: true,
+                    tags: { include: { tag: true } },
+                },
+            });
         });
 
         return {

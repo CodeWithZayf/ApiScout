@@ -1,4 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? (() => { throw new Error('NEXT_PUBLIC_API_URL must be set in production'); })()
+    : 'http://localhost:3001/api');
 
 export async function apiFetch<T = any>(path: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
@@ -10,11 +14,18 @@ export async function apiFetch<T = any>(path: string, options?: RequestInit): Pr
     headers['Content-Type'] = headers['Content-Type'] || 'application/json';
   }
 
-  const res = await fetch(`${API_BASE_URL}${path}`, {
+  const method = (options?.method ?? 'GET').toUpperCase();
+  const fetchOptions: RequestInit = {
     ...options,
     headers,
-    next: { revalidate: 60 },
-  });
+  };
+
+  // Only cache GET requests
+  if (method === 'GET') {
+    (fetchOptions as any).next = { revalidate: 60 };
+  }
+
+  const res = await fetch(`${API_BASE_URL}${path}`, fetchOptions);
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);

@@ -9,6 +9,7 @@ import {
     Body,
     UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApisService } from './apis.service';
 import { QueryApisDto } from './dto/query-apis.dto';
 import { CreateApiDto } from './dto/create-api.dto';
@@ -48,6 +49,7 @@ export class ApisController {
         return this.apisService.findBySlug(slug);
     }
 
+    @Throttle({ default: { ttl: 60000, limit: 10 } })
     @Post(':slug/view')
     incrementView(@Param('slug') slug: string) {
         return this.apisService.incrementView(slug);

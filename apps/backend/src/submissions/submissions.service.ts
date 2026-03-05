@@ -51,11 +51,24 @@ export class SubmissionsService {
         };
     }
 
-    async findUserSubmissions(userId: string) {
-        return this.prisma.apiSubmission.findMany({
-            where: { submittedBy: userId },
-            orderBy: { createdAt: 'desc' },
-        });
+    async findUserSubmissions(userId: string, page = 1, limit = 20) {
+        const take = Math.min(limit, 100);
+        const skip = (page - 1) * take;
+
+        const [submissions, total] = await Promise.all([
+            this.prisma.apiSubmission.findMany({
+                where: { submittedBy: userId },
+                orderBy: { createdAt: 'desc' },
+                skip,
+                take,
+            }),
+            this.prisma.apiSubmission.count({ where: { submittedBy: userId } }),
+        ]);
+
+        return {
+            data: submissions,
+            meta: { total, page, limit: take, totalPages: Math.ceil(total / take) },
+        };
     }
 
     async updateStatus(id: string, status: SubmissionStatus, reviewNotes?: string) {

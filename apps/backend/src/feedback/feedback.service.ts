@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { FeedbackType } from '@prisma/client';
+import { FeedbackType, Prisma } from '@prisma/client';
 
 @Injectable()
 export class FeedbackService {
     constructor(private prisma: PrismaService) { }
 
     async toggle(userId: string, apiId: string, type: FeedbackType) {
-        const existing = await this.prisma.feedbackSignal.findUnique({
-            where: { userId_apiId_type: { userId, apiId, type } },
-        });
-
-        if (existing) {
-            await this.prisma.feedbackSignal.delete({ where: { id: existing.id } });
-            return { toggled: false, type };
+        // Idempotent toggle: attempt create, catch duplicate to delete
+        try {
+            await this.prisma.feedbackSignal.create({
+                data: { userId, apiId, type },
+            });
+            return { toggled: true, type };
+        } catch (e) {
+            if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+                await this.prisma.feedbackSignal.delete({
+                    where: { userId_apiId_type: { userId, apiId, type } },
+                });
+                return { toggled: false, type };
+            }
+            throw e;
         }
-
-        await this.prisma.feedbackSignal.create({
-            data: { userId, apiId, type },
-        });
-
-        return { toggled: true, type };
     }
 
     async getCounts(apiId: string) {
