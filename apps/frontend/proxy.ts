@@ -5,13 +5,6 @@ export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const token = request.cookies.get('apiscout_token')?.value;
 
-    // Protect /profile routes — require a valid token cookie
-    if (pathname.startsWith('/profile')) {
-        if (!token) {
-            return NextResponse.redirect(new URL('/login', request.url));
-        }
-    }
-
     // Protect /admin routes — require valid token cookie + ADMIN role
     if (pathname.startsWith('/admin')) {
 
@@ -36,5 +29,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/profile/:path*'],
+    matcher: ['/admin/:path*'],
 };
