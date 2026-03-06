@@ -161,6 +161,52 @@ export class AuthService {
         return user;
     }
 
+    async updateProfile(userId: string, dto: { name?: string; email?: string; currentPassword?: string; newPassword?: string }) {
+        const user = await this.prisma.user.findUnique({ where: { id: userId } });
+        if (!user) {
+            throw new BadRequestException('User not found');
+        }
+
+        // Require current password when changing email or password
+        if (dto.email || dto.newPassword) {
+            if (!dto.currentPassword) {
+                throw new BadRequestException('Current password is required to change email or password');
+            }
+            if (!user.password) {
+                throw new BadRequestException('Cannot change password for OAuth accounts');
+            }
+            const valid = await bcrypt.compare(dto.currentPassword, user.password);
+            if (!valid) {
+                throw new BadRequestException('Current password is incorrect');
+            }
+        }
+
+        const data: any = {};
+
+        if (dto.name !== undefined) {
+            data.name = dto.name;
+        }
+
+        if (dto.email && dto.email !== user.email) {
+            const existing = await this.prisma.user.findUnique({ where: { email: dto.email } });
+            if (existing) {
+                throw new ConflictException('Email already in use');
+            }
+            data.email = dto.email;
+        }
+
+        if (dto.newPassword) {
+            data.password = await bcrypt.hash(dto.newPassword, 10);
+        }
+
+        if (Object.keys(data).length === 0) {
+            return this.getProfile(userId);
+        }
+
+        await this.prisma.user.update({ where: { id: userId }, data });
+        return this.getProfile(userId);
+    }
+
     async refresh(refreshToken: string) {
         const key = `refresh:${refreshToken}`;
         const raw = await this.redis.get(key);

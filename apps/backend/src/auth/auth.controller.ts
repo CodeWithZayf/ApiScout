@@ -1,8 +1,8 @@
-import { Controller, Post, Get, Body, UseGuards, Request, Res } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, UseGuards, Request, Res } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginDto, InitiateSignupDto, VerifyOtpDto } from './dto/auth.dto';
+import { LoginDto, InitiateSignupDto, VerifyOtpDto, UpdateProfileDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 const ACCESS_COOKIE_OPTIONS = {
@@ -90,5 +90,12 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     getProfile(@Request() req: any) {
         return this.authService.getProfile(req.user.sub);
+    }
+
+    @Throttle({ default: { ttl: 60000, limit: 10 } })
+    @Patch('profile')
+    @UseGuards(JwtAuthGuard)
+    updateProfile(@Request() req: any, @Body() dto: UpdateProfileDto) {
+        return this.authService.updateProfile(req.user.sub, dto);
     }
 }

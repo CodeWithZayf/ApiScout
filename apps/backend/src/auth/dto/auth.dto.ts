@@ -34,3 +34,26 @@ export class VerifyOtpDto {
     @Length(6, 6)
     otp: string;
 }
+
+export class UpdateProfileDto {
+    @IsOptional()
+    @IsString()
+    name?: string;
+
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    currentPassword?: string;
+
+    @IsOptional()
+    @IsString()
+    @MinLength(8, { message: 'Password must be at least 8 characters' })
+    @MaxLength(128)
+    @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+        message: 'Password must contain at least one uppercase letter, one lowercase letter, and one digit',
+    })
+    newPassword?: string;
+}

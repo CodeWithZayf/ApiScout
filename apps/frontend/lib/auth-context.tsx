@@ -18,6 +18,7 @@ interface AuthContextType {
     login: (email: string, password: string) => Promise<void>;
     loginWithToken: (user: User, accessToken: string) => void;
     logout: () => void;
+    refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -117,8 +118,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearAuth();
     };
 
+    const refreshProfile = async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/me`, { credentials: "include" });
+            if (res.ok) {
+                const data = await res.json();
+                setUser(data);
+                localStorage.setItem("apiscout_user", JSON.stringify(data));
+            }
+        } catch {
+            // Silently fail — profile will update on next page load
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, token, isLoading, login, loginWithToken, logout }}>
+        <AuthContext.Provider value={{ user, token, isLoading, login, loginWithToken, logout, refreshProfile }}>
             {children}
         </AuthContext.Provider>
     );

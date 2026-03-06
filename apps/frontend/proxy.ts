@@ -1,12 +1,19 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
+    const token = request.cookies.get('apiscout_token')?.value;
 
-    // Protect /admin routes — require valid token cookie
+    // Protect /profile routes — require a valid token cookie
+    if (pathname.startsWith('/profile')) {
+        if (!token) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+    }
+
+    // Protect /admin routes — require valid token cookie + ADMIN role
     if (pathname.startsWith('/admin')) {
-        const token = request.cookies.get('apiscout_token')?.value;
 
         if (!token) {
             return NextResponse.redirect(new URL('/login', request.url));
@@ -29,5 +36,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/admin/:path*'],
+    matcher: ['/admin/:path*', '/profile/:path*'],
 };

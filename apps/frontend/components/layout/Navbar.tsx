@@ -99,14 +99,17 @@ export function Navbar() {
               <>
                 {user ? (
                   <div className="hidden items-center gap-2 lg:flex">
-                    <div className="flex items-center gap-2 rounded-xl bg-gray-100 px-3 py-1.5">
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-2 rounded-xl bg-gray-100 px-3 py-1.5 transition hover:bg-gray-200"
+                    >
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-xs font-bold text-white">
                         {user.name?.[0] || user.email[0].toUpperCase()}
                       </div>
                       <span className="text-sm font-medium text-gray-700">
                         {user.name || user.email.split("@")[0]}
                       </span>
-                    </div>
+                    </Link>
                     <button
                       onClick={logout}
                       className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition"
@@ -188,6 +191,13 @@ export function Navbar() {
                     </div>
                     <span className="text-sm font-medium">{user.name || user.email}</span>
                   </div>
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+                  >
+                    My Profile
+                  </Link>
                   <button
                     onClick={() => { logout(); setMobileMenuOpen(false); }}
                     className="rounded-lg px-4 py-3 text-left text-sm font-medium text-red-600 transition hover:bg-red-50"
