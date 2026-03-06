@@ -35,10 +35,7 @@ export function BookmarkButton({
         try {
             const res = await fetch(`${API_BASE_URL}/bookmarks/${apiId}`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                credentials: "include",
             });
 
             if (res.ok) {

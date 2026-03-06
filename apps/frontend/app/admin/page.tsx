@@ -54,7 +54,7 @@ export default function AdminPage() {
         setLoading(true);
         try {
             const res = await fetch(`${API_BASE_URL}/submissions`, {
-                headers: { Authorization: `Bearer ${token}` },
+                credentials: "include",
             });
             if (res.ok) {
                 const data = await res.json();
@@ -70,10 +70,8 @@ export default function AdminPage() {
         try {
             const res = await fetch(`${API_BASE_URL}/submissions/${id}/status`, {
                 method: "PATCH",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ status }),
             });
             if (res.ok) {

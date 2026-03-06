@@ -82,10 +82,8 @@ export default function SubmitPage() {
         try {
             const res = await fetch(`${API_BASE_URL}/submissions`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify(formData),
             });
 

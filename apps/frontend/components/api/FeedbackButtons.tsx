@@ -30,10 +30,8 @@ export function FeedbackButtons({ apiId, feedbackCounts = {} }: FeedbackButtonsP
         try {
             const res = await fetch(`${API_BASE_URL}/feedback`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
                 body: JSON.stringify({ apiId, type }),
             });
 
