@@ -73,7 +73,29 @@ export function Navbar() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            {!isLoading && (
+            {isLoading ? (
+              <>
+                <Link href="/login" className="hidden lg:block">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/signup" className="hidden lg:block">
+                  <Button
+                    size="sm"
+                    className="rounded-xl bg-orange-500 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  >
+                    Get Started
+                    <span className="ml-1 text-orange-200">·</span>
+                    <span className="text-orange-200">It&apos;s Free</span>
+                  </Button>
+                </Link>
+              </>
+            ) : (
               <>
                 {user ? (
                   <div className="hidden items-center gap-2 lg:flex">
