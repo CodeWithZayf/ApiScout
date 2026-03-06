@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/lib/auth-context";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -163,9 +164,7 @@ export default function SignupPage() {
                     <>
                         {/* Header */}
                         <div className="mb-8 text-center">
-                            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 shadow-lg shadow-orange-500/25">
-                                <span className="text-xl font-bold text-white">A</span>
-                            </div>
+                            <Image src="/logo.png" alt="ApiScout Logo" width={48} height={48} className="mx-auto mb-4 rounded-2xl" />
                             <h1 className="text-2xl font-bold tracking-tight">Create your account</h1>
                             <p className="mt-2 text-sm text-gray-500">
                                 Join APIScout to bookmark, review, and submit APIs

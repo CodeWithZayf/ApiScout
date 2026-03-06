@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -28,9 +29,7 @@ export function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-500 shadow-sm">
-                <span className="text-lg font-bold text-white">A</span>
-              </div>
+              <Image src="/logo.png" alt="ApiScout Logo" width={36} height={36} className="rounded-xl" />
               <span className="text-lg font-semibold tracking-tight text-gray-900">
                 ApiScout
               </span>
